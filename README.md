@@ -23,4 +23,4 @@ To install the application, follow these steps:
 - POST /create_group: Create a new group.
 - POST /join_group: Join an existing group.
 - GET /recommend_friends/<username>: Get recommended friends for a user.
-= GET /search_users: Search for users based on name, location, or interests.
+- GET /search_users: Search for users based on name, location, or interests.
