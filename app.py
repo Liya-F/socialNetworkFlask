@@ -122,6 +122,43 @@ class SocialNetworkApp:
         tx.run("MATCH (u:User {name: $user}), (g:Group {name: $group_name}) "
                "MERGE (u)-[:JOIN {since: date()}]->(g)",
                user=user, group_name=group_name)
+        
+    def recommend_friends(self, user):
+        with self.driver.session() as session:
+            result = session.execute_read(self._recommend_friends, user)
+            return [record["recommended_friend"] for record in result]
+
+    @staticmethod
+    def _recommend_friends(tx, user):
+        query = """
+        MATCH (u:User {name: $user})-[:FRIENDS_WITH]->(friend)-[:FRIENDS_WITH]->(recommended_friend)
+        WHERE NOT (u)-[:FRIENDS_WITH]->(recommended_friend) AND u <> recommended_friend
+        RETURN DISTINCT recommended_friend.name AS recommended_friend
+        """
+        result = tx.run(query, user=user)
+        return result
+
+    def search_users(self, name=None, location=None, interests=None):
+        with self.driver.session() as session:
+            result = session.execute_read(self._search_users, name, location, interests)
+            return [record["user"] for record in result]
+
+    @staticmethod
+    def _search_users(tx, name, location, interests):
+        query = "MATCH (u:User) WHERE "
+        conditions = []
+        params = {}
+        if name:
+            conditions.append("u.name CONTAINS $name")
+            params["name"] = name
+        if location:
+            conditions.append("u.location = $location")
+            params["location"] = location
+        if interests:
+            conditions.append("ANY(interest IN u.interests WHERE interest IN $interests)")
+            params["interests"] = interests
+        query += " AND ".join(conditions)
+        return tx.run(query, **params)    
 
 
 # Initialize the SocialNetworkApp
@@ -199,6 +236,20 @@ def join_group():
     data = request.get_json()
     app_soc_net.join_group(data['user'], data['group_name'])
     return jsonify({"message": "Joined group"}), 200
+
+@app.route('/recommend_friends', methods=['GET'])
+def recommend_friends():
+    user = request.args.get('user')
+    recommended_friends = app_soc_net.recommend_friends(user)
+    return jsonify({"recommended_friends": recommended_friends})
+
+@app.route('/search_users', methods=['GET'])
+def search_users():
+    name = request.args.get('name')
+    location = request.args.get('location')
+    interests = request.args.getlist('interests')
+    search_results = app_soc_net.search_users(name, location, interests)
+    return jsonify({"search_results": search_results})
 
 
 if __name__ == '__main__':
