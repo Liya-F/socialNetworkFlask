@@ -11,16 +11,16 @@ To install the application, follow these steps:
 4. Run the application
 - It will run on port 5002
 5. End points
-GET /: Home page.
-POST /register: Register a new user.
-POST /update_user: Update user information.
-POST /send_friend_request: Send a friend request.
-POST /accept_friend_request: Accept a friend request.
-POST /remove_friend: Remove a friend.
-POST /create_post: Create a new post.
-POST /like_post: Like a post.
-POST /comment_on_post: Comment on a post.
-POST /create_group: Create a new group.
-POST /join_group: Join an existing group.
-GET /recommend_friends/<username>: Get recommended friends for a user.
-GET /search_users: Search for users based on name, location, or interests.
+- GET /: Home page.
+- POST /register: Register a new user.
+- PUT /update_user: Update user information.
+- POST /send_friend_request: Send a friend request.
+- POST /accept_friend_request: Accept a friend request.
+- DELETE /remove_friend: Remove a friend.
+- POST /create_post: Create a new post.
+- POST /like_post: Like a post.
+- POST /comment_on_post: Comment on a post.
+- POST /create_group: Create a new group.
+- POST /join_group: Join an existing group.
+- GET /recommend_friends/<username>: Get recommended friends for a user.
+= GET /search_users: Search for users based on name, location, or interests.
